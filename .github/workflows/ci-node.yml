@@ -40,9 +40,14 @@ jobs:
         args: >
           -Dsonar.organization=tiago-org
           -Dsonar.projectKey=node-app-demo
-          -Dsonar.sources=node-app/src
-          -Dsonar.tests=node-app/tests
-          -Dsonar.javascript.lcov.reportPaths=node-app/coverage/lcov.info
+          -Dsonar.sources=src
+          -Dsonar.tests=tests
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+    - name: Install & Test
+      run: |
+          npm ci
+          npm test
+
 
   quality-gate:
     needs: sonarcloud
