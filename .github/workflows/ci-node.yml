@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  sonar-scan:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -18,35 +18,38 @@ jobs:
       with:
         node-version: 20
         cache: 'npm'
-        cache-dependency-path: node-app/package-lock.json
-    - name: Install deps & Test
+    - name: Install & Test
       run: |
         cd node-app
         npm ci
         npm test -- --coverage reporters=lcov
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v4
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-      with:
-        projectBaseDir: node-app/
-    - name: Quality Gate Check
-      if: github.event_name != 'pull_request'
-      uses: SonarSource/sonarqube-quality-gate-action@v1
-      timeout-minutes: 5
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy:
-    needs: sonar-scan
+  sonarcloud:
+    needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
-    - name: Build & Push Docker
-      run: |
-        cd node-app
-        docker build -t ghcr.io/${{ github.repository }}/node-app:latest .
-        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-        docker push ghcr.io/${{ github.repository }}/node-app:latest
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better branch coverage
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.organization=tiago-org
+          -Dsonar.projectKey=node-app-demo
+          -Dsonar.sources=node-app/src
+          -Dsonar.tests=node-app/tests
+          -Dsonar.javascript.lcov.reportPaths=node-app/coverage/lcov.info
+
+  quality-gate:
+    needs: sonarcloud
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: sonarsource/sonarqube-quality-gate-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: https://sonarcloud.io

@@ -1,0 +1,29 @@
+{
+  "name": "sonar-quality",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tiagocosta225/sonar-quality.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Tiagocosta225/sonar-quality/issues"
+  },
+  "homepage": "https://github.com/Tiagocosta225/sonar-quality#readme",
+  "devDependencies": {
+    "express": "^5.2.1",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  }
+}
