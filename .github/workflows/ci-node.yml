@@ -21,7 +21,7 @@ jobs:
     - name: Install & Test
       run: |
         npm ci
-        npm test -- --coverage reporters=lcov
+        "test": "jest --coverage --coverageReporters=lcov"
 
   sonarcloud:
     needs: test
