@@ -39,7 +39,7 @@ jobs:
       with:
         args: >
           -Dsonar.organization=tiago-org
-          -Dsonar.projectKey=node-app-demo
+          -Dsonar.projectKey=demo
           -Dsonar.sources=src
           -Dsonar.tests=tests
           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
